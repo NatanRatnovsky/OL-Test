@@ -1,0 +1,40 @@
+table {
+  width: 100%;
+}
+mat-card {
+  width: 80%;
+  margin: auto;
+}
+
+mat-toolbar {
+  height: 80px;
+  font-size: 30px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.mat-form-field {
+  font-size: 14px;
+  width: 100%;
+}
+
+td{
+  width: 16%;
+}
+
+.mat-input {
+  font-size: 20px;
+}
+
+.mat-header-cell {
+  font-size: 20px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.mat-cell {
+  font-size: 18px;
+  text-align: center;
+}
+
+
