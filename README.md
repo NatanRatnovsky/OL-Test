@@ -7,7 +7,7 @@
 
 - Swapper 
 
--H2 Database 
+- H2 Database 
 
 - Angular 8 
 
