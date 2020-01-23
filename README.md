@@ -5,7 +5,7 @@
 
 - Hibernate 
 
-- Swapper 
+- Swagger 
 
 - H2 Database 
 
