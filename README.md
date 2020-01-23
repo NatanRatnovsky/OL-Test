@@ -1,17 +1,17 @@
-#OL-Test
-Mini project based on technology's :
+# OL-Test
+## Mini project based on technology's :
 
-`*`Spring boot 
+- Spring boot 
 
-`*`Hibernate 
+- Hibernate 
 
-`*`Swapper 
+- Swapper 
 
-`*`H2 Database 
+-H2 Database 
 
-`*`Angular 8 
+- Angular 8 
 
-`*`Angular Material 
+- Angular Material 
 
 ``` mark
 Contained Docker file
