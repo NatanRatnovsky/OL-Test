@@ -20,7 +20,7 @@ public class MainController {
 
     @GetMapping("/allItems")
     @ApiOperation(value = "Find all Item in database",
-                 notes = "Return list of all items from database")
+            notes = "Return list of all items from database")
     public ResponseEntity<Iterable<Item>> getAllItems() {
         return ResponseEntity.ok(itemRepos.findAll());
     }
@@ -33,7 +33,7 @@ public class MainController {
 
     @DeleteMapping(path = "rmItem/{id}")
     @ApiOperation(value = "Delete item by id",
-    notes = "Delete item by specific id from database")
+            notes = "Delete item by specific id from database")
     public ResponseEntity<Item> deleteItem(@PathVariable("id") long id) {
         itemRepos.deleteById(id);
         return ResponseEntity.noContent().build();
@@ -47,9 +47,30 @@ public class MainController {
 
     @GetMapping(path = "item/{id}")
     @ApiOperation(value = "Find Item by id",
-    notes = "Provide an id to look up specific item from list of items",
-    response = Item.class)
+            notes = "Provide an id to look up specific item from list of items",
+            response = Item.class)
     public ResponseEntity<Optional<Item>> getItem(@PathVariable("id") long id) {
         return ResponseEntity.ok(itemRepos.findById(id));
     }
+
+    @PutMapping(path = "withdraw/{id}+{amount}")
+    @ApiOperation(value = "Change amount of item by id",
+            notes = "Provide an id to look up specific item from list of items, if find item change amount if amount of item=> amount",
+            response = Item.class)
+    public ResponseEntity<Item> withdraw(@PathVariable("id") Long id, @PathVariable("amount") Integer amount) {
+        if (id >= 0 && amount >= 0) {
+            if (itemRepos.findById(id).isPresent()) {
+                Item itemFromDB = itemRepos.findById(id).get();
+                if (itemFromDB.getAmount() >= amount) {
+                    itemFromDB.setAmount(itemFromDB.getAmount() - amount);
+                    itemRepos.save(itemFromDB);
+                    return ResponseEntity.status(HttpStatus.OK).body(itemFromDB);
+                }
+            }
+        } else {
+            return null;
+        }
+        return null;
+    }
+
 }
