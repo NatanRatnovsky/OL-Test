@@ -4,11 +4,12 @@ import com.natran.OLTest.beans.Item;
 import com.natran.OLTest.repos.ItemRepos;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
+import javax.validation.Valid;
 import java.util.Optional;
 
 @RestController
@@ -26,23 +27,36 @@ public class MainController {
     }
 
     @PostMapping("/addItem")
-    public ResponseEntity<Item> addItem(@RequestBody Item item) {
-        itemRepos.save(item);
-        return ResponseEntity.status(HttpStatus.CREATED).body(item);
+    public ResponseEntity<Item> addItem(@Valid @RequestBody Item item) {
+        if (item.getAmount() >= 0) {
+            itemRepos.save(item);
+            return ResponseEntity.status(HttpStatus.CREATED).body(item);
+        }
+        return ResponseEntity.unprocessableEntity().body(item);
     }
 
     @DeleteMapping(path = "rmItem/{id}")
     @ApiOperation(value = "Delete item by id",
             notes = "Delete item by specific id from database")
-    public ResponseEntity<Item> deleteItem(@PathVariable("id") long id) {
-        itemRepos.deleteById(id);
-        return ResponseEntity.noContent().build();
+    public Object deleteItem(@PathVariable("id") long id)
+    throws ResourceNotFoundException {
+        if (itemRepos.findById(id).isPresent()) {
+            itemRepos.deleteById(id);
+            return ResponseEntity.status(HttpStatus.OK);
+        }
+            return ResponseEntity.notFound();
     }
 
     @PutMapping(path = "updateItem")
-    public ResponseEntity<Item> updateItem(@RequestBody Item item) {
-        itemRepos.save(item);
-        return ResponseEntity.status(HttpStatus.OK).body(item);
+    public Object updateItem(@RequestBody Item item) {
+        if (itemRepos.findById(item.getId()).isPresent()) {
+            if (item.getAmount() >= 0) {
+                itemRepos.save(item);
+                return ResponseEntity.status(HttpStatus.OK).body(item);
+            }
+            return ResponseEntity.unprocessableEntity();
+        }
+        return ResponseEntity.notFound();
     }
 
     @GetMapping(path = "item/{id}")
@@ -50,7 +64,13 @@ public class MainController {
             notes = "Provide an id to look up specific item from list of items",
             response = Item.class)
     public ResponseEntity<Optional<Item>> getItem(@PathVariable("id") long id) {
-        return ResponseEntity.ok(itemRepos.findById(id));
+        if (id >= 0) {
+            return Optional
+                    .ofNullable(itemRepos.findById(id))
+                    .map(item -> ResponseEntity.ok().body(item))
+                    .orElseGet(() -> ResponseEntity.notFound().build());
+        }
+        return ResponseEntity.unprocessableEntity().build();
     }
 
     @PutMapping(path = "withdraw/{id}+{amount}")
@@ -68,9 +88,8 @@ public class MainController {
                 }
             }
         } else {
-            return null;
+            return ResponseEntity.notFound().build();
         }
-        return null;
+        return ResponseEntity.unprocessableEntity().build();
     }
-
 }
