@@ -27,7 +27,7 @@ public class MainController {
     }
 
     @PostMapping("/addItem")
-    public ResponseEntity<Item> addItem(@Valid @RequestBody Item item) {
+    public ResponseEntity<Object> addItem(@Valid @RequestBody Item item) {
         if (item.getAmount() >= 0) {
             itemRepos.save(item);
             return ResponseEntity.status(HttpStatus.CREATED).body(item);
@@ -48,7 +48,7 @@ public class MainController {
     }
 
     @PutMapping(path = "updateItem")
-    public Object updateItem(@RequestBody Item item) {
+    public synchronized Object updateItem(@RequestBody Item item) {
         if (itemRepos.findById(item.getId()).isPresent()) {
             if (item.getAmount() >= 0) {
                 itemRepos.save(item);
@@ -73,11 +73,10 @@ public class MainController {
         return ResponseEntity.unprocessableEntity().build();
     }
 
-    @PutMapping(path = "withdraw/{id}+{amount}")
+    @PutMapping(path = "withdraw/{id}")
     @ApiOperation(value = "Change amount of item by id",
-            notes = "Provide an id to look up specific item from list of items, if find item change amount if amount of item=> amount",
-            response = Item.class)
-    public ResponseEntity<Item> withdraw(@PathVariable("id") Long id, @PathVariable("amount") Integer amount) {
+            notes = "Provide an id to look up specific item from list of items, if item is found, change amount if amount of item=> amount")
+    public synchronized Object withdraw(@PathVariable("id") Long id, @ModelAttribute(value = "amount") Integer amount) {
         if (id >= 0 && amount >= 0) {
             if (itemRepos.findById(id).isPresent()) {
                 Item itemFromDB = itemRepos.findById(id).get();
